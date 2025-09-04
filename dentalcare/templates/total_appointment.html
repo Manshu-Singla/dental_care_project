@@ -1,0 +1,111 @@
+{% extends 'doctor_base.html' %}
+
+{% block body_content %}
+<div class="max-w-6xl mx-auto mt-10 bg-white shadow-lg rounded-2xl p-8">
+    <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">📅 Appointments</h2>
+
+    <!-- Filter Form -->
+    <form method="get" class="flex flex-col md:flex-row items-center gap-4 mb-6">
+        <div class="flex items-center gap-2">
+            <label for="date" class="text-gray-700 font-medium">Filter by date:</label>
+            <input
+                type="date"
+                name="date"
+                id="date"
+                value="{{ selected_date|default:'' }}"
+                class="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            >
+        </div>
+        <div class="flex gap-3">
+            <button
+                type="submit"
+                class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
+            >
+                Filter
+            </button>
+            <a
+                href="{% url 'total_appointments' %}"
+                class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg shadow hover:bg-gray-300 transition"
+            >
+                Show All
+            </a>
+        </div>
+    </form>
+
+    <!-- Appointment Table -->
+    <div class="overflow-x-auto">
+        <table class="min-w-full border border-gray-200 divide-y divide-gray-200 rounded-lg overflow-hidden">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">ID</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Patient</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Date</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Reason</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Status</th>
+                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-600">Action</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-100">
+                {% for appointment in appointments %}
+                <tr class="hover:bg-gray-50 transition">
+                    <td class="px-6 py-4 text-gray-900">{{ appointment.id }}</td>
+
+                    <!-- Patient name and phone -->
+                    <td class="px-6 py-4 text-gray-900 font-medium">
+                        {{ appointment.user.get_full_name|default:appointment.user.username }}
+                        {% if appointment.user.phone %}
+                            <div class="text-xs text-gray-500">📞 {{ appointment.user.phone }}</div>
+                        {% endif %}
+                    </td>
+
+                    <td class="px-6 py-4 text-gray-700">{{ appointment.date }}</td>
+
+                    <!-- Reason for appointment -->
+                    <td class="px-6 py-4 text-gray-700">
+                        {{ appointment.reason|default:"-" }}
+                    </td>
+
+                    <td class="px-6 py-4">
+                        {% if appointment.status == "pending" %}
+                            <span class="px-3 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</span>
+                        {% elif appointment.status == "confirmed" %}
+                            <span class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Confirmed</span>
+                        {% elif appointment.status == "cancelled" %}
+                            <span class="px-3 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Cancelled</span>
+                        {% endif %}
+                    </td>
+
+                    <td class="px-6 py-4">
+                        {% if appointment.is_expired %}
+                            <span class="text-gray-400 text-sm">Expired</span>
+                        {% else %}
+                            {% if appointment.status == 'pending' %}
+                                <form method="post" action="{% url 'confirm_appointment' appointment.id %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="px-3 py-1 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition" onclick="return confirm('Confirm this appointment?');">Confirm</button>
+                                </form>
+                                <form method="post" action="{% url 'cancel_appointment' appointment.id %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="px-3 py-1 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition" onclick="return confirm('Cancel this appointment?');">Cancel</button>
+                                </form>
+                            {% elif appointment.status == 'confirmed' %}
+                                <form method="post" action="{% url 'cancel_appointment' appointment.id %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="px-3 py-1 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition" onclick="return confirm('Cancel this appointment?');">Cancel</button>
+                                </form>
+                            {% else %}
+                                <span class="text-gray-400 text-sm">-</span>
+                            {% endif %}
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="px-6 py-4 text-center text-gray-500">No appointments found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doctor Dashboard</title>
+  <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.png' %}">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+  <!-- Navbar -->
+  <nav class="bg-blue-600 p-4 shadow-lg">
+    <div class="container mx-auto flex justify-between items-center">
+      <h1 class="text-white text-2xl font-bold">Doctor Dashboard</h1>
+      <ul class="flex space-x-6 text-white font-medium">
+        <li><a href="{% url 'doctor_index' %}" class="hover:text-gray-200">Home</a></li>
+        <li><a href="{% url 'total_appointments' %}" class="hover:text-gray-200">Appointments</a></li>
+        <li><a href="{% url 'received_contacts' %}" class="hover:text-gray-200">recieved_conatct</a></li>
+        <li><a href="{% url 'doctor_patients' %}" class="hover:text-gray-200">View Patients</a></li>
+        <li><a href="{% url 'profile' %}" class="hover:text-gray-200">Profile</a></li>
+        <li><a href="{% url 'log_out' %}" class="hover:text-gray-200">Logout</a></li>
+      </ul>
+    </div>
+  </nav>
+
+{% block body_content %}
+    
+{% endblock %}  
+
+  <!-- Footer -->
+  <footer class="bg-blue-600 text-white text-center py-4 mt-12">
+    <p>&copy; 2025 Doctor Dashboard. All rights reserved.</p>
+  </footer>
+
+</body>
+</html>

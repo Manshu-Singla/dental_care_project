@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block body_content %}
+<div class="max-w-3xl mx-auto mt-10 bg-white shadow-md rounded-lg p-6">
+  <h2 class="text-2xl font-semibold mb-4">Edit Profile</h2>
+
+  <form method="post" enctype="multipart/form-data" class="space-y-4">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label class="text-sm font-medium text-gray-700">First name</label>
+        {{ form.first_name }}
+        {{ form.first_name.errors }}
+      </div>
+      <div>
+        <label class="text-sm font-medium text-gray-700">Last name</label>
+        {{ form.last_name }}
+        {{ form.last_name.errors }}
+      </div>
+      <div>
+        <label class="text-sm font-medium text-gray-700">Email</label>
+        {{ form.email }}
+        {{ form.email.errors }}
+      </div>
+      <div>
+        <label class="text-sm font-medium text-gray-700">Phone</label>
+        {{ form.phone }}
+        {{ form.phone.errors }}
+      </div>
+
+      <!-- patient fields -->
+      <div>
+        <label class="text-sm font-medium text-gray-700">Age</label>
+        {{ form.age }}
+        {{ form.age.errors }}
+      </div>
+      <div>
+        <label class="text-sm font-medium text-gray-700">Gender</label>
+        {{ form.gender }}
+        {{ form.gender.errors }}
+      </div>
+
+      <!-- doctor fields -->
+  {% if user.role == "doctor" %}
+  <div>
+    <label class="text-sm font-medium text-gray-700">Specialization</label>
+    {{ form.specialization }}
+    {{ form.specialization.errors }}
+  </div>
+
+  <div>
+    <label class="text-sm font-medium text-gray-700">Qualification</label>
+    {{ form.qualification }}
+    {{ form.qualification.errors }}
+  </div>
+{% endif %}
+
+      <!-- Profile image -->
+      <div class="md:col-span-2">
+        <label class="text-sm font-medium text-gray-700">Profile photo</label>
+        {{ form.profile_image }}
+        {{ form.profile_image.errors }}
+        {% if user.profile_image %}
+          <p class="mt-2">Current:</p>
+          <img src="{{ user.profile_image.url }}" class="w-24 h-24 object-cover rounded-md mt-2">
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="flex justify-end gap-3 mt-4">
+      <a href="{% url 'profile' %}" class="px-4 py-2 border rounded-md text-gray-700">Cancel</a>
+      <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md">Save changes</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

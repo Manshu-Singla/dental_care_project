@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+{% block body_content %}
+<div class="max-w-4xl mx-auto mt-10 bg-white shadow-lg rounded-2xl p-8">
+    <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">📅 Book Appointment</h2>
+
+    {% if messages %}
+        <div class="mb-4">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-2">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <form method="post" class="space-y-6">
+        {% csrf_token %}
+        
+        <!-- Step 1: Select Doctor and Date -->
+        {% if not available_slots %}
+            <div class="bg-gray-50 p-6 rounded-lg">
+                <h3 class="text-lg font-semibold text-gray-700 mb-4">Step 1: Select Doctor and Date</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Select Doctor</label>
+                        {{ form.doctor }}
+                        {% if form.doctor.errors %}
+                            <p class="text-red-500 text-sm mt-1">{{ form.doctor.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Select Date</label>
+                        {{ form.date }}
+                        {% if form.date.errors %}
+                            <p class="text-red-500 text-sm mt-1">{{ form.date.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <button type="submit" name="check_availability"
+                    class="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-lg shadow-md transition duration-300 mt-6 font-semibold">
+                    Check Available Slots →
+                </button>
+            </div>
+        {% endif %}
+        
+        <!-- Step 2: Select Time Slot -->
+        {% if available_slots %}
+            <div class="bg-blue-50 p-6 rounded-lg">
+                <h3 class="text-lg font-semibold text-gray-700 mb-4">Step 2: Select Time Slot</h3>
+                
+                <!-- Display selected doctor and date -->
+                <div class="bg-white p-4 rounded-lg mb-4">
+                    <p class="text-sm text-gray-600">
+                        <strong>Doctor:</strong> {{ selected_doctor.get_display_name }}
+                        {% if selected_doctor.specialization %}
+                            <span class="ml-2 text-gray-500">({{ selected_doctor.specialization }})</span>
+                        {% endif %}
+                    </p>
+                    <p class="text-sm text-gray-600 mt-1">
+                        <strong>Date:</strong> {{ selected_date|date:"l, F d, Y" }}
+                    </p>
+                </div>
+                
+                <!-- Hidden fields to preserve doctor and date -->
+                <input type="hidden" name="doctor" value="{{ selected_doctor.id }}">
+                <input type="hidden" name="date" value="{{ selected_date|date:'Y-m-d' }}">
+                
+                <label class="block text-sm font-medium text-gray-700 mb-3">Available Time Slots</label>
+<div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
+    {% for slot_value, slot_label in available_slots %}
+        <label class="cursor-pointer block">
+            <input 
+                type="radio" 
+                name="time_slot" 
+                value="{{ slot_value }}" 
+                required 
+               
+            >
+            <div class="rounded-lg border-2 border-gray-300 bg-white py-3 px-4 text-center transition-all duration-200
+                        hover:bg-blue-50 hover:border-blue-400 
+                        peer-checked:border-blue-600 peer-checked:bg-blue-600 peer-checked:text-white peer-checked:font-semibold">
+                <span class="text-sm">{{ slot_label }}</span>
+            </div>
+        </label>
+    {% endfor %}
+</div>
+
+
+
+
+
+
+                
+                <!-- Reason for appointment (optional) -->
+                <div class="mt-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Reason for Appointment (Optional)</label>
+                    {{ form.reason }}
+                </div>
+                
+                <div class="flex gap-4 mt-6">
+                    <button type="submit" name="check_availability"
+                        class="flex-1 bg-gray-400 hover:bg-gray-500 text-white py-3 px-4 rounded-lg shadow-md transition duration-300 font-semibold">
+                        ← Change Selection
+                    </button>
+                    <button type="submit" name="book_slot"
+                        class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg shadow-md transition duration-300 font-semibold">
+                        Confirm Booking ✓
+                    </button>
+                </div>
+            </div>
+        {% endif %}
+        
+        {% if not available_slots and selected_date %}
+            <!-- No slots available message -->
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+                <p class="text-yellow-700">
+                    No available slots for {{ selected_doctor.get_display_name }} on {{ selected_date|date:"F d, Y" }}.
+                    Please try a different date or doctor.
+                </p>
+            </div>
+            <button type="submit" name="check_availability"
+                class="w-full bg-gray-400 hover:bg-gray-500 text-white py-3 px-4 rounded-lg shadow-md transition duration-300 font-semibold">
+                ← Try Different Selection
+            </button>
+        {% endif %}
+    </form>
+    
+    <!-- Information Box -->
+    <div class="mt-8 bg-gray-100 rounded-lg p-4">
+        <h4 class="font-semibold text-gray-700 mb-2">ℹ️ Important Information</h4>
+        <ul class="text-sm text-gray-600 space-y-1">
+            <li>• You can book maximum 2 appointments per day</li>
+            <li>• Appointments are subject to doctor's confirmation</li>
+            <li>• Please arrive 10 minutes before your scheduled time</li>
+            <li>• Working hours: 9:00 AM - 6:00 PM</li>
+        </ul>
+    </div>
+</div>
+
+<style>
+    .form-control {
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.375rem;
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+    }
+    .form-control:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends 'doctor_base.html' %} 
+{% block body_content %}
+<div class="max-w-4xl mx-auto mt-10 bg-white shadow-lg rounded-2xl p-8">
+  <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">
+    👤 Profile
+  </h2>
+
+  <div class="grid md:grid-cols-2 gap-6">
+    <!-- Basic Info -->
+    <div class="space-y-4">
+      <p><span class="font-semibold text-gray-700">Username:</span> {{ user.username }}</p>
+      <p><span class="font-semibold text-gray-700">Email:</span> {{ user.email }}</p>
+      <p><span class="font-semibold text-gray-700">Phone:</span> {{ user.phone|default:"-" }}</p>
+      <p><span class="font-semibold text-gray-700">Role:</span> {{ user.get_role_display }}</p>
+    </div>
+
+    <!-- Role Specific Info -->
+    <div class="space-y-4">
+      {% if user.role == "doctor" %}
+        <p><span class="font-semibold text-gray-700">Full Name:</span> {{ user.get_display_name }}</p>
+        <p><span class="font-semibold text-gray-700">Specialization:</span> {{ user.specialization|default:"Not provided" }}</p>
+        <p><span class="font-semibold text-gray-700">Qualification:</span> {{ user.qualification|default:"Not provided" }}</p>
+      {% elif user.role == "patient" %}
+        <p><span class="font-semibold text-gray-700">Full Name:</span> {{ user.first_name }} {{ user.last_name }}</p>
+        <p><span class="font-semibold text-gray-700">Age:</span> {{ user.age|default:"-" }}</p>
+        <p><span class="font-semibold text-gray-700">Gender:</span> {{ user.gender|default:"-" }}</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="mt-8 flex justify-center gap-4">
+    <a href="{% url 'home' %}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+      ⬅ Back to Home
+    </a>
+  </div>
+</div>
+{% endblock %}
